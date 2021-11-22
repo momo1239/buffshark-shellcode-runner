@@ -1,6 +1,6 @@
 # buffshark-shellcode-runner
 
-## Python Shellcode Runner for windows and linux
+## Python Shellcode Runner to execute malicious payload and bypass AV
 This script utilizes mmap(for linux) and win32 api wrappers (for windows) to execute shellcode in memory and bypass Windows Defender.
 
 ## Installation and Compiling
