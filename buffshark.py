@@ -14,7 +14,7 @@ print(" Author: Lenard Nguyen ")
 print("==========================")
 
 parser = argparse.ArgumentParser(description="Python Shellcode Runner")
-parser.add_argument('-u', '--url', type=str, metavar='', required=True, help="URL to shellcode")
+parser.add_argument('-u', '--url', type=str, metavar='', required=True, help="URL to raw shellcode file")
 args = parser.parse_args()
 
 
