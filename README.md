@@ -11,16 +11,16 @@ This script utilizes mmap(for linux) and win api wrappers (for windows) to execu
 └─# python3 buffshark.py -h                                       
 ==========================
 Buff Shark Shellcode Runner
- Author: Momo Nguyen 
+ Author: Momo Nguyen
 ==========================
 usage: buffshark.py [-h] -u  -a
 
 Python Shellcode Runner
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -u , --url            URL to raw shellcode file
-  -a , --architecture   Choose OS
+  -h, --help   show this help message and exit
+  -u , --url   URL to raw shellcode file
+  -a , --os    Choose OS: win/nix
   ```
                                      
 4. Optional: Install pyinstaller to compile to windows executable: `pip install pyinstaller`
