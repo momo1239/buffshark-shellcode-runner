@@ -2,7 +2,6 @@
 import sys
 import mmap
 import ctypes
-import pyaes
 import time
 import argparse
 import urllib.request
